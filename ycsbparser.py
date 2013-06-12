@@ -1,4 +1,7 @@
+import pymongo
 import matplotlib.pyplot as plt
+
+from datetime import datetime
 
 filename = "/Users/ace/YCSB/testout"
 lineheader = "[{0}], "
@@ -45,12 +48,19 @@ while True:
         infile.readline()
         currentline = infile.readline()
     while(currentline.startswith(lineheader.format(cursection))):
-        results[cursection]["histogram"].append(currentline.split(',')[2])
+        results[cursection]["histogram"].append(currentline.strip().split(',')[2])
         currentline = infile.readline()
     sectionidx += 1
     if sectionidx >= len(sectionnames):
         break
 
-plt.plot(results["UPDATE"]["histogram"][0:5])
+#plt.plot(results["UPDATE"]["histogram"][0:5])
 #plt.plot(histograms["READ"])
-plt.show()
+#plt.show()
+
+#insert results into databse
+client = pymongo.MongoClient()
+db = client['ycsbResults']
+coll = db['results']
+results['ts'] = datetime.now()
+coll.insert(results)
