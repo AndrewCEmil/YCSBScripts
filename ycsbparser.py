@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from datetime import datetime
 
-filename = "/Users/ace/YCSB/testout"
+filename = "/Users/ace/perftesting/testouts/newVolTest4"
 lineheader = "[{0}], "
 RunTimeMs = -1
 throughput = -1
@@ -33,6 +33,8 @@ sectionnames = ["UPDATE", "READ"]
 sectionidx = 0
 currentline = infile.readline()
 results = { "UPDATE" : { "histogram" : [] }, "READ": { "histogram" : [] } }
+#forgot to put this in before
+results["OVERALL"] = { "throughput" : throughput, "RunTimeMs" : RunTimeMs}
 newsection = True
 while True:
     cursection = sectionnames[sectionidx]
@@ -59,8 +61,10 @@ while True:
 #plt.show()
 
 #insert results into databse
-client = pymongo.MongoClient()
-db = client['ycsbResults']
-coll = db['results']
-results['ts'] = datetime.now()
-coll.insert(results)
+#client = pymongo.MongoClient()
+#db = client['ycsbResults']
+#coll = db['results']
+#results['ts'] = datetime.now()
+#coll.insert(results)
+
+print results
