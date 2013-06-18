@@ -1,8 +1,8 @@
 #!/bin/bash
-FNAME="/Users/ace/perftesting/testouts/testout`date +%s`"
-echo $FNAME
-date >> $FNAME
-/Users/ace/YCSB/bin/ycsb load mongodb -P /Users/ace/YCSB/workloads/workloada >> $FNAME
-date >> $FNAME
-/Users/ace/YCSB/bin/ycsb run mongodb -P /Users/ace/YCSB/workloads/workloada >> $FNAME
-date >> $FNAME
+#FNAME="/Users/ace/perftesting/testouts/testout`date +%s`"
+TESTNUM="0"
+LOADNAME="/home/ec2-user/perftesting/testouts/loadout"$TESTNUM
+TESTNAME="/home/ec2-user/perftesting/testouts/testout"$TESTNUM
+
+/home/ec2-user/YCSB/bin/ycsb load mongodb -P /home/ec2-user/YCSB/workloads/workloada >> $LOADNAME
+/home/ec2-user/YCSB/bin/ycsb run mongodb -P /home/ec2-user/YCSB/workloads/workloada >> $TESTNAME

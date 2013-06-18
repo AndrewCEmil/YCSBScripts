@@ -1,0 +1,17 @@
+//a file with ec2 cli samples
+
+//creating new instances
+ec2-run-instances ami-0358ce33 -t t1.micro -k testkeys
+
+ec2-run-instances ami-0358ce33 -k acekeys -t m1.large 
+
+//creating + attaching volumes
+ec2-create-volume -s 11 -z us-west-2a
+ec2-attach-volume vol-f67a7ece -i i-4a04587f -d /dev/sdd1
+
+$sudo mkfs -t ext4 /dev/sdd1
+$sudo mkdir /mnt/test
+$sudo mount /dev/sdd1 /mnt/test
+
+//adding tags
+ec2-create-tags i-fe91b7cb --tag name=AceTest2
