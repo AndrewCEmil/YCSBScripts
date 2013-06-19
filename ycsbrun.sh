@@ -1,8 +1,8 @@
 #!/bin/bash
-#FNAME="/Users/ace/perftesting/testouts/testout`date +%s`"
-read TESTNUM
-LOADNAME="/home/ec2-user/perftesting/testouts/loadout"$TESTNUM
-TESTNAME="/home/ec2-user/perftesting/testouts/testout"$TESTNUM
+#note that this takes an arg that is the outfiles suffix
 
-/home/ec2-user/YCSB/bin/ycsb load mongodb -P /home/ec2-user/YCSB/workloads/workloada >> $LOADNAME
-/home/ec2-user/YCSB/bin/ycsb run mongodb -P /home/ec2-user/YCSB/workloads/workloada >> $TESTNAME
+LOADNAME="/home/ec2-user/loadout"$1
+TESTNAME="/home/ec2-user/testout"$1
+
+/home/ec2-user/YCSB/bin/ycsb load mongodb -P /home/ec2-user/workloada -threads 100 >> $LOADNAME
+/home/ec2-user/YCSB/bin/ycsb run mongodb -P /home/ec2-user/workloada -threads 100 >> $TESTNAME

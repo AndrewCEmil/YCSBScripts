@@ -1,8 +1,12 @@
 import pymongo
 import sys
+import logging
 #import matplotlib.pyplot as plt
 
 from datetime import datetime
+
+logging.basicConfig(filename="parser.log", level=logging.DEBUG)
+logger = logging.getLogger("parser")
 
 pathname = "/home/ec2-user/"
 elenum = "0"
@@ -14,12 +18,12 @@ def fullrun():
     loadfilename = pathname + "loadout" + elenum
     testfilename = pathname + "testout" + elenum
     #TODO try/catch
-    print "opening files..."
+    logger.debug("opening files...")
     loadfile = open(loadfilename)
     testfile = open(testfilename)
-    print "parsing load file"
+    logger.debug("parsing load file")
     loadres = parseout(loadfile, True)
-    print "parsing test file"
+    logger.debug("parsing test file")
     testres = parseout(testfile, False)
     print "LOADRES:"
     print loadres
@@ -28,13 +32,13 @@ def fullrun():
 
 def parseout(infile, isload):
     #skip a few header lines
-    print "looping over headers"
+    logger.debug("looping over headers")
     currentline = infile.readline()
     while("OVERALL" not in currentline):
         currentline = infile.readline()
 
     #overall section
-    print "handling overall section"
+    logger.debug("handling overall section")
     sectionname = "OVERALL"
     RunTimeMs = float(currentline.split(',')[2])
     currentline = infile.readline()
@@ -50,11 +54,11 @@ def parseout(infile, isload):
         results["UPDATE"] = {}
         results["READ"] = {}
 
-    print "handling main data"
+    logger.debug("handling main data")
     sectionidx = 0
     currentline = infile.readline()
     while True:
-        print "handling header data"
+        logger.debug("handling header data")
         cursection = sectionnames[sectionidx]
         #first handle the header for the new section
         results[cursection]["ops"] = currentline.strip().split(',')[2]
@@ -67,7 +71,7 @@ def parseout(infile, isload):
         #TODO what is this next line? for now skip it
         infile.readline()
 
-        print "handling histogram data"
+        logger.debug("handling histogram data")
         currentline = infile.readline()
         while(cursection in currentline):
             #results[cursection]["histogram"].append(currentline.strip().split(',')[2])
@@ -76,7 +80,7 @@ def parseout(infile, isload):
         sectionidx += 1
         if sectionidx >= len(sectionnames):
             break
-    print "returning results"
+    logger.debug("returning results")
     return results
 
 #plt.plot(results["UPDATE"]["histogram"][0:5])

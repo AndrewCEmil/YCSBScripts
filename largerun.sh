@@ -5,13 +5,14 @@
 #assumptions:
 #-DB has the cleandb.sh in the home directory
 #-Client has ycsbrun.sh and ycsbparser in home directory
+#-Both machines do not require tty for sudo (turn off in /etc/sudoers)
 
 CLIENTURL="ec2-50-112-40-236.us-west-2.compute.amazonaws.com"
 DBURL="ec2-54-214-150-65.us-west-2.compute.amazonaws.com"
 KEYP="/Users/ace/perftesting/keys/acekeys.pem"
 OUTPATH="/Users/ace/perftesting/testouts/bigout"
 
-echo $CLIENTURL
+echo "start" > $OUTPATH
 #1) reset database
 
 #loop + run ycsb tests + save output 
@@ -22,5 +23,6 @@ do
     #Next start the client with the new number
     ssh -i $KEYP ec2-user@$CLIENTURL sudo /home/ec2-user/ycsbrun.sh $i
     #finally append the output to the output file
+    echo $i >> $OUTPATH
     ssh -i $KEYP ec2-user@$CLIENTURL python /home/ec2-user/ycsbparser.py $i >> $OUTPATH
 done
