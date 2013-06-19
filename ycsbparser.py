@@ -1,4 +1,5 @@
 import pymongo
+import sys
 #import matplotlib.pyplot as plt
 
 from datetime import datetime
@@ -8,6 +9,8 @@ elenum = "0"
 
 def fullrun():
     #generate filenames
+    if len(sys.argv) > 1:
+        elenum = sys.argv[1]
     loadfilename = pathname + "loadout" + elenum
     testfilename = pathname + "testout" + elenum
     #TODO try/catch

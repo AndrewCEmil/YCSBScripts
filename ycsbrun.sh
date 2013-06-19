@@ -1,6 +1,6 @@
 #!/bin/bash
 #FNAME="/Users/ace/perftesting/testouts/testout`date +%s`"
-TESTNUM="0"
+read TESTNUM
 LOADNAME="/home/ec2-user/perftesting/testouts/loadout"$TESTNUM
 TESTNAME="/home/ec2-user/perftesting/testouts/testout"$TESTNUM
 

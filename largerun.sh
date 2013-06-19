@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#the goal here is to run a series of ycsb tests with resets on the db everytime
+
+#assumptions:
+#-DB has the cleandb.sh in the home directory
+#-Client has ycsbrun.sh and ycsbparser in home directory
+
+CLIENTURL="ec2-50-112-40-236.us-west-2.compute.amazonaws.com"
+DBURL="ec2-54-214-150-65.us-west-2.compute.amazonaws.com"
+KEYP="/Users/ace/perftesting/keys/acekeys.pem"
+OUTPATH="/Users/ace/perftesting/testouts/bigout"
+
+echo $CLIENTURL
+#1) reset database
+
+#loop + run ycsb tests + save output 
+for i in {1..10}
+do
+    #First clean/restart the database 
+    ssh -i $KEYP ec2-user@$DBURL sudo /home/ec2-user/cleandb.sh
+    #Next start the client with the new number
+    ssh -i $KEYP ec2-user@$CLIENTURL sudo /home/ec2-user/ycsbrun.sh $i
+    #finally append the output to the output file
+    ssh -i $KEYP ec2-user@$CLIENTURL python /home/ec2-user/ycsbparser.py $i >> $OUTPATH
+done
