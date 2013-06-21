@@ -3,7 +3,8 @@
 DBPATH="/mnt/ebs/data/"
 LOGPATH="/mnt/ebs/data/log"
 JPATH="/mnt/dur/"
-MDPATH="/home/ec2-user/mongodb-linux-x86_64-2.4.4/bin/mongod"
+#MDPATH="/home/ec2-user/mongodb-linux-x86_64-2.4.4/bin/mongod"
+MDPATH="/home/ec2-user/tokumx/bin/mongod"
 JLINK=$DBPATH"journal"
 
 pgrep mongo | xargs sudo kill

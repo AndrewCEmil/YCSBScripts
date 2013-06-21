@@ -8,18 +8,24 @@
 #-Both machines do not require tty for sudo (turn off in /etc/sudoers)
 
 CLIENTURL="ec2-50-112-40-236.us-west-2.compute.amazonaws.com"
-DBURL="ec2-54-214-150-65.us-west-2.compute.amazonaws.com"
+#DBURL="ec2-54-214-150-65.us-west-2.compute.amazonaws.com"
+DBURL="ec2-54-214-86-242.us-west-2.compute.amazonaws.com"
 KEYP="/Users/ace/perftesting/keys/acekeys.pem"
-OUTPATH="/Users/ace/perftesting/testouts/bigout"
+OUTPATH="/Users/ace/perftesting/testouts/bigtestclean.log"
+
+CLEANDBP="/home/ec2-user/cleandb.sh"
+
 
 echo "start" > $OUTPATH
-#1) reset database
+#clean the excess files
+ssh -i $KEYP ec2-user@$CLIENTURL rm -f loadout*
+ssh -i $KEYP ec2-user@$CLIENTURL rm -f testout*
 
 #loop + run ycsb tests + save output 
 for i in {1..10}
 do
     #First clean/restart the database 
-    ssh -i $KEYP ec2-user@$DBURL sudo /home/ec2-user/cleandb.sh
+    ssh -i $KEYP ec2-user@$DBURL sudo $CLEANDBP
     #Next start the client with the new number
     ssh -i $KEYP ec2-user@$CLIENTURL sudo /home/ec2-user/ycsbrun.sh $i
     #finally append the output to the output file
