@@ -11,7 +11,7 @@ echo $#
 
 while [[ $# -gt 0 ]] ; do
     echo $1
-    python $MPERFPATH/runner.py --rhost=$RHOST --rport=$RPORT -l $# --mongod=$1
+    python $MPERFPATH/runner.py --rhost=$RHOST --rport=$RPORT -l $# --mongod=$1 -n 10
     rm -rf ./db
     shift
 done
