@@ -18,4 +18,6 @@ rm -rf $JPATH*
 sudo ln -s $JPATH $JLINK
 
 #next we turn on mongod
-$MDPATH --dbpath $DBPATH --logpath $LOGPATH --fork 
+#$MDPATH --dbpath $DBPATH --logpath $LOGPATH --fork 
+numactl --interleave=all $MDPATH --dbpath $DBPATH --logpath $LOGPATH --fork 
+echo 0 > /proc/sys/vm/zone_reclaim_mode

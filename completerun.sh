@@ -13,16 +13,9 @@
 #-Both machines do not require tty for sudo (turn off in /etc/sudoers)
 
 #1) Initialization and command line parsing
-DBURL="stor02"
-CLEANDBP="/mnt/workspace/YCSBScripts/cleandb.sh"
-OUTDIR="/mnt/testouts/initial/stor02_fio_large_tues20"
-KEYP="/root/.ssh/id_rsa"
-YCSBP="/mnt/workspace/YCSB/bin/ycsb"
-WORKLOADP="/mnt/workspace/YCSB/workloads"
-#a file for the recordcount and operation count
-WORKLOADCOUNTP="/mnt/workspace/YCSB/workloads/settings"
-NUMTHREADS="100"
-MSTAT="/mnt/workspace/mongo/mongostat"
+#the config file
+$RUNCONFFILE="./run.conf"
+source $RUNCONFFILE
 
 rm -rf $OUTDIR/*
 mkdir $OUTDIR
