@@ -13,70 +13,67 @@
 #-Both machines do not require tty for sudo (turn off in /etc/sudoers)
 
 #1) Initialization and command line parsing
-DBURL="10gencasvr.local"
-CLEANDBP="/home/ace/cleandb.sh"
-#CLEANDBP="/home/ace/cleandbdisk.sh"
-#CLEANDBP="/home/ace/cleandbseperate.sh"
-OUTDIR="/Users/ace/perftesting/testouts/J08RAID2"
-KEYP="/Users/ace/perftesting/keys/10gencasvr_root_key"
-YCSBP="/Users/ace/achilleYCSB/YCSB/bin/ycsb"
-WORKLOADP="/Users/ace/perftesting/workloads"
+DBURL="stor02"
+CLEANDBP="/mnt/workspace/YCSBScripts/cleandb.sh"
+OUTDIR="/mnt/testouts/initial/stor02_fio_large_tues20"
+KEYP="/root/.ssh/id_rsa"
+YCSBP="/mnt/workspace/YCSB/bin/ycsb"
+WORKLOADP="/mnt/workspace/YCSB/workloads"
 #a file for the recordcount and operation count
-WORKLOADCOUNTP="/Users/ace/perftesting/workloads/counts"
-USRNAME="ace"
+WORKLOADCOUNTP="/mnt/workspace/YCSB/workloads/settings"
 NUMTHREADS="100"
+MSTAT="/mnt/workspace/mongo/mongostat"
+
 rm -rf $OUTDIR/*
 mkdir $OUTDIR
-
-#2) Storing system data TODO
-
 
 #3) Instrumenting systems 
 ssh -i $KEYP root@$DBURL mpstat -P ALL 1 > $OUTDIR/mpstat &
 MPSTATPID=$!
-ssh -i $KEYP root@$DBURL iostat -d -x -h 1 > $OUTDIR/iostat &
+ssh -i $KEYP root@$DBURL iostat -d -x -h -t 1 > $OUTDIR/iostat &
 IOSTATPID=$!
-ssh -i $KEYP root@$DBURL mongostat > $OUTDIR/mongostat &
-MONGOSTATPID=$!
 
 #4) actual testing
 #workloada
 ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloada"
+ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+echo "loading workloada" >> $OUTDIR/runout
+echo `date` >> $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloada -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloada_load
-echo "running workloada"
+
+echo "running workloada" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloada -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloada_run
 #workloadb
-ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloadb"
-$YCSBP load mongodb -P $WORKLOADP/workloadb -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadb_load
-echo "running workloadb"
+echo "running workloadb" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloadb -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadb_run
-#workloadc
-ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloadc"
-$YCSBP load mongodb -P $WORKLOADP/workloadc -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadc_load
-echo "running workloadc"
+echo "running workloadc" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloadc -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadc_run
+echo "running workloadf" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
+$YCSBP run mongodb -P $WORKLOADP/workloadf -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadf_run
+
 #workloadd
 ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloadd"
+ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+echo "loading workloadd" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloadd -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadd_load
-echo "running workloadd"
+echo "running workloadd" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloadd -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadd_run
 #workloade
 ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloade"
+ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+echo "loading workloade" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloade -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloade_load
-echo "running workloade"
+echo "running workloade" | tee -a $OUTDIR/runout
+echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloade -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloade_run
-#workloadf
-ssh -i $KEYP root@$DBURL $CLEANDBP
-echo "loading workloadf"
-$YCSBP load mongodb -P $WORKLOADP/workloadf -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadf_load
-echo "running workloadf"
-$YCSBP run mongodb -P $WORKLOADP/workloadf -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadf_run
+
 #5) cleanup
 kill $MPSTATPID
 kill $IOSTATPID
-kill $MONGOSTATPID
