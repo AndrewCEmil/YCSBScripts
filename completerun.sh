@@ -25,15 +25,15 @@ rm $OUTDIR/workload*
 mkdir $OUTDIR
 
 #3) Instrumenting systems 
-ssh -i $KEYP root@$DBURL mpstat -P ALL 1 > $OUTDIR/mpstat &
+ssh -i $KEYP $SSHUSER@$DBURL mpstat -P ALL 1 > $OUTDIR/mpstat &
 MPSTATPID=$!
-ssh -i $KEYP root@$DBURL iostat -d -x -h -t 1 > $OUTDIR/iostat &
+ssh -i $KEYP $SSHUSER@$DBURL iostat -d -x -h -t 1 > $OUTDIR/iostat &
 IOSTATPID=$!
 
 #4) actual testing
 #workloada
-ssh -i $KEYP root@$DBURL $CLEANDBP
-ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+ssh -i $KEYP $SSHUSER@$DBURL $CLEANDBP
+ssh -i $KEYP $SSHUSER@$DBURL $MSTAT >> $OUTDIR/mongostat &
 echo "loading workloada" >> $OUTDIR/runout
 echo `date` >> $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloada -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloada_load
@@ -53,8 +53,8 @@ echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloadf -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadf_run
 
 #workloadd
-ssh -i $KEYP root@$DBURL $CLEANDBP
-ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+ssh -i $KEYP $SSHUSER@$DBURL $CLEANDBP
+ssh -i $KEYP $SSHUSER@$DBURL $MSTAT >> $OUTDIR/mongostat &
 echo "loading workloadd" | tee -a $OUTDIR/runout
 echo `date` | tee -a $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloadd -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadd_load
@@ -62,8 +62,8 @@ echo "running workloadd" | tee -a $OUTDIR/runout
 echo `date` | tee -a $OUTDIR/runout
 $YCSBP run mongodb -P $WORKLOADP/workloadd -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloadd_run
 #workloade
-ssh -i $KEYP root@$DBURL $CLEANDBP
-ssh -i $KEYP root@$DBURL $MSTAT >> $OUTDIR/mongostat &
+ssh -i $KEYP $SSHUSER@$DBURL $CLEANDBP
+ssh -i $KEYP $SSHUSER@$DBURL $MSTAT >> $OUTDIR/mongostat &
 echo "loading workloade" | tee -a $OUTDIR/runout
 echo `date` | tee -a $OUTDIR/runout
 $YCSBP load mongodb -P $WORKLOADP/workloade -P $WORKLOADCOUNTP -threads $NUMTHREADS > $OUTDIR/workloade_load
