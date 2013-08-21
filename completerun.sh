@@ -14,10 +14,14 @@
 
 #1) Initialization and command line parsing
 #the config file
-$RUNCONFFILE="./run.conf"
+RUNCONFFILE="./run.conf"
 source $RUNCONFFILE
 
-rm -rf $OUTDIR/*
+rm $OUTDIR/iostat
+rm $OUTDIR/mpstat
+rm $OUTDIR/mongostat
+rm $OUTDIR/runout
+rm $OUTDIR/workload*
 mkdir $OUTDIR
 
 #3) Instrumenting systems 
