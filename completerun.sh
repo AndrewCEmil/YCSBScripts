@@ -74,3 +74,4 @@ $YCSBP run mongodb -P $WORKLOADP/workloade -P $WORKLOADCOUNTP -threads $NUMTHREA
 #5) cleanup
 kill $MPSTATPID
 kill $IOSTATPID
+echo 'DONE' | tee -a $OUTDIR/runout
