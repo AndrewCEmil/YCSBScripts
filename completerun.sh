@@ -14,7 +14,7 @@
 
 #1) Initialization and command line parsing
 #the config file
-RUNCONFFILE="./run.conf"
+RUNCONFFILE="/mnt/workspace/YCSBScripts/run.conf"
 source $RUNCONFFILE
 
 rm $OUTDIR/iostat

@@ -1,13 +1,15 @@
 import os
 
 #BASE_DIR = '/mnt/testouts/initial/stor02_fio_large_weds21/'
-BASE_DIR = '/Users/ace/perftesting/testouts/J02FIO/'
+#BASE_DIR = '/Users/ace/perftesting/testouts/J02FIO/'
+BASE_DIR = '/Users/ace/perftesting/smfio/stor02_fio_100GB_fri23/'
 
 def main():
     outstr = ""
     #first we find all the target files
     target_file_paths = get_target_file_paths()
     print target_file_paths
+    target_file_paths.sort()
     #then we parse them
     for target in target_file_paths:
         outstr += '********** ' + target + ' **********\n'
