@@ -11,6 +11,8 @@ BASE_MONGOD_PORT=27017
 
 #TODO base log + journal paths here
 BASE_DATA_PATH=/mnt/data10/datatest
+BASE_LOG_PATH=/mnt/log10/datatest
+BASE_DUR_PATH=/mnt/journal10/datatest
 
 NUM_SHARDS=2
 NUM_MONGOS=1
@@ -27,7 +29,10 @@ echo "****************** turning on mongods"
 CUR_MONGOD_PORT=$BASE_MONGOD_PORT
 for i in `seq $NUM_SHARDS`; do
     mkdir $BASE_DATA_PATH/mongod_$i
-    $MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/mongod_$i --logpath $BASE_DATA_PATH/mongod_$i/log --fork
+    mkdir $BASE_DUR_PATH/mongod_$i
+    ln -s $BASE_DUR_PATH/mongod_$i/ $BASE_DATA_PATH/mongod_$i/journal
+    echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/mongod_$i --logpath $BASE_LOG_PATH/mongod_log_$i --fork"
+    $MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/mongod_$i --logpath $BASE_LOG_PATH/mongod_$i.log --fork
     CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 done;
 
@@ -35,8 +40,10 @@ echo "******************* turning on config server"
 #3) set up config server
 #for now, single config server
 mkdir $BASE_DATA_PATH/config
-echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_MONGOD_PATH/config/log --fork"
-$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_DATA_PATH/config/log --fork
+mkdir $BASE_DUR_PATH/mongod_config
+ln -s $BASE_DUR_PATH/mongod_config/ $BASE_DATA_PATH/mongod_$i/journal
+echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_LOG_PATH/config_log --fork"
+$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_LOG_PATH/config.log --fork
 CONF_PORT=$CUR_MONGOD_PORT
 CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 
@@ -45,8 +52,7 @@ echo "********************* turning on mongos"
 #4) set up mongos instaces
 mkdir $BASE_DATA_PATH/mongos
 for i in `seq $NUM_MONGOS`; do
-    echo "$MONGOS_PATH --logpath $BASE_DATA_PATH/mongos/$i.log --configdb "localhost:$CONF_PORT" --port $CUR_MONGOD_PORT --fork"
-    $MONGOS_PATH --logpath $BASE_DATA_PATH/mongos/$i.log --configdb "localhost:$CONF_PORT" --port $CUR_MONGOD_PORT --fork
+    $MONGOS_PATH --logpath $BASE_LOG_PATH/mongos_$i.log --configdb "localhost:$CONF_PORT" --port $CUR_MONGOD_PORT --fork
     CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 done;
 MONGOS_PORT=$(($CUR_MONGOD_PORT - 1))
