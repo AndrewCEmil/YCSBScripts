@@ -10,7 +10,7 @@ MONGOS_PATH=/mnt/workspace/mongo/mongos
 BASE_MONGOD_PORT=27017
 
 #TODO base log + journal paths here
-BASE_DATA_PATH=/mnt/data10
+BASE_DATA_PATH=/mnt/data10/datatest
 
 NUM_SHARDS=2
 NUM_MONGOS=1
@@ -22,7 +22,7 @@ SHARD_PATTERN="{_id: 1}"
 
 
 #2) turn on mongods
-echo "turning on mongods"
+echo "****************** turning on mongods"
 #TODO NUMA fixes #TODO
 CUR_MONGOD_PORT=$BASE_MONGOD_PORT
 for i in `seq $NUM_SHARDS`; do
@@ -31,29 +31,34 @@ for i in `seq $NUM_SHARDS`; do
     CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 done;
 
-echo "turning on config server"
+echo "******************* turning on config server"
 #3) set up config server
 #for now, single config server
 mkdir $BASE_DATA_PATH/config
-$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_MONGOD_PATH/config/log --fork
+echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_MONGOD_PATH/config/log --fork"
+$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_DATA_PATH/config/log --fork
 CONF_PORT=$CUR_MONGOD_PORT
 CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 
-echo "turning on mongos"
+sleep 100
+echo "********************* turning on mongos"
 #4) set up mongos instaces
 mkdir $BASE_DATA_PATH/mongos
 for i in `seq $NUM_MONGOS`; do
+    echo "$MONGOS_PATH --logpath $BASE_DATA_PATH/mongos/$i.log --configdb "localhost:$CONF_PORT" --port $CUR_MONGOD_PORT --fork"
     $MONGOS_PATH --logpath $BASE_DATA_PATH/mongos/$i.log --configdb "localhost:$CONF_PORT" --port $CUR_MONGOD_PORT --fork
     CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 done;
 MONGOS_PORT=$(($CUR_MONGOD_PORT - 1))
 
+sleep 100 
 #5) start up cluster
-echo "initializing cluster"
+echo "*********************** initializing cluster"
 #first we sleep to allow all the wakeups to occur
-sleep 20
-for i in `seq $NUM_MONGODS`; do
-    $MONGO_PATH --port $MONGOS_PORT --eval "sh.addShard('localhost:$BASE_MONGOD_PORT')"
+TEMP_MONGOD_PORT=$BASE_MONGOD_PORT
+for i in `seq $NUM_SHARDS`; do
+    $MONGO_PATH --port $MONGOS_PORT --eval "sh.addShard('localhost:$TEMP_MONGOD_PORT')"
+    TEMP_MONGOD_PORT=$(($TEMP_MONGOD_PORT + 1))
 done
 
 #enable sharding for the db
