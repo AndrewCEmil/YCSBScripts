@@ -15,6 +15,10 @@ BASE_DATA_PATH=/mnt/data10
 NUM_SHARDS=2
 NUM_MONGOS=1
 
+SHARD_DB="ycsb"
+SHARD_COLLECTION="usertable"
+SHARD_PATTERN="{_id: 1}"
+
 
 
 #2) turn on mongods
@@ -51,5 +55,9 @@ sleep 20
 for i in `seq $NUM_MONGODS`; do
     $MONGO_PATH --port $MONGOS_PORT --eval "sh.addShard('localhost:$BASE_MONGOD_PORT')"
 done
+
+#enable sharding for the db
+$MONGO_PATH --port $MONGOS_PORT --eval "sh.enableSharding('$SHARD_DB')"
+$MONGO_PATH --port $MONGOS_PORT --eval "sh.shardCollection('$SHARD_DB.$SHARD_COLLECTION', $SHARD_PATTERN)"
 
 echo "done!"
