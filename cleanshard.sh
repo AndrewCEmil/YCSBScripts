@@ -6,7 +6,7 @@ CONF_PATH=./shardconf.sh
 . $CONF_PATH
 
 #first, kill + clean existing locations
-pgrep mongo | xargs sudo kill
+pgrep mongo | xargs kill
 
 #first we remove old files
 rm -rf $BASE_DATA_PATH/*
