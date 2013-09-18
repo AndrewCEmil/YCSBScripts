@@ -39,8 +39,6 @@ for i in `seq $NUM_MONGOS`; do
 done;
 MONGOS_PORT=$(($CUR_MONGOD_PORT - 1))
 
-echo 0 > /proc/sys/vm/zone_reclaim_mode
-
 sleep 100 
 #5) start up cluster
 echo "*********************** initializing cluster"
