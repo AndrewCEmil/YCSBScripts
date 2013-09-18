@@ -11,9 +11,8 @@ echo "****************** turning on mongods"
 CUR_MONGOD_PORT=$BASE_MONGOD_PORT
 for i in `seq $NUM_SHARDS`; do
     mkdir $BASE_DATA_PATH/mongod_$i
-    mkdir $BASE_DUR_PATH/mongod_$i
-    ln -s $BASE_DUR_PATH/mongod_$i/ $BASE_DATA_PATH/mongod_$i/journal
-    echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/mongod_$i --logpath $BASE_LOG_PATH/mongod_log_$i --fork"
+    mkdir $BASE_DUR_PATH/mongod_dur_$i
+    ln -s $BASE_DUR_PATH/mongod_dur_$i/ $BASE_DATA_PATH/mongod_$i/journal
     numactl --interleave=all $MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/mongod_$i --logpath $BASE_LOG_PATH/mongod_$i.log --fork
     CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
 done;
@@ -24,7 +23,6 @@ echo "******************* turning on config server"
 mkdir $BASE_DATA_PATH/config
 mkdir $BASE_DUR_PATH/mongod_config
 ln -s $BASE_DUR_PATH/mongod_config/ $BASE_DATA_PATH/mongod_$i/journal
-echo "$MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_LOG_PATH/config_log --fork"
 numactl --interleave=all $MONGOD_PATH --port $CUR_MONGOD_PORT --dbpath $BASE_DATA_PATH/config --logpath $BASE_LOG_PATH/config.log --fork
 CONF_PORT=$CUR_MONGOD_PORT
 CUR_MONGOD_PORT=$(($CUR_MONGOD_PORT + 1))
